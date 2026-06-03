@@ -1,19 +1,21 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:vibe/core/utility/cloudinary_service.dart';
 
-class StorageRepository {
-  final _cloudinary = CloudinaryService();
+class FirebaseStoragePost {
+  static final _cloudinary = CloudinaryService();
 
-  Future<String> uploadFile(File postFile, String destination) async {
-    final url = await _cloudinary.uploadImage(postFile);
+  static Future<String> uploadFile(File file, String destination) async {
+    final url = await _cloudinary.uploadImage(file);
     return url ?? '';
   }
 
-  Future<String> uploadData(dynamic data, String destination) async {
-    return '';
+  static Future<String> uploadData(Uint8List data, String destination) async {
+    final url = await _cloudinary.uploadBytes(data, destination);
+    return url ?? '';
   }
 
-  Future<void> deleteFile(String previousFileUrl) async {
-    // Cloudinary deletion via API se necessário
+  static Future<void> deleteImageFromStorage(String url) async {
+    // implementar se necessário
   }
 }
