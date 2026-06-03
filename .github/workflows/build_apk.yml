@@ -28,6 +28,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Fix package name
+        run: find lib -name "*.dart" -exec sed -i 's/package:instagram\//package:vibe\//g' {} +
+
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
 
