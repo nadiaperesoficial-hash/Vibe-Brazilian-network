@@ -75,8 +75,8 @@ dependencies:
   cupertino_icons: ^1.0.8
 
 dependency_overrides:
-  page_transition: 2.0.0
-
+  page_transition: 2.1.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
