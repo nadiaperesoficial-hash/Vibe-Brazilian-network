@@ -2,14 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:instagram/core/resources/assets_manager.dart';
-import 'package:instagram/core/resources/color_manager.dart';
-import 'package:instagram/core/resources/strings_manager.dart';
-import 'package:instagram/core/resources/styles_manager.dart';
-import 'package:instagram/core/utility/constant.dart';
-import 'package:instagram/presentation/cubit/firebaseAuthCubit/firebase_auth_cubit.dart';
-import 'package:instagram/presentation/pages/register/sign_up_page.dart';
-import 'package:instagram/presentation/widgets/global/custom_widgets/custom_text_field.dart';
+import 'package:vibe/core/resources/assets_manager.dart';
+import 'package:vibe/core/resources/color_manager.dart';
+import 'package:vibe/core/resources/strings_manager.dart';
+import 'package:vibe/core/resources/styles_manager.dart';
+import 'package:vibe/core/utility/constant.dart';
+import 'package:vibe/presentation/cubit/firebaseAuthCubit/firebase_auth_cubit.dart';
+import 'package:vibe/presentation/pages/register/sign_up_page.dart';
+import 'package:vibe/presentation/widgets/global/custom_widgets/custom_text_field.dart';
 
 class RegisterWidgets extends StatefulWidget {
   final TextEditingController emailController;
@@ -250,6 +250,7 @@ class _EmailTextFields extends StatefulWidget {
 
 class _EmailTextFieldsState extends State<_EmailTextFields> {
   String? errorMassage;
+
   @override
   void initState() {
     widget.controller.addListener(() {
@@ -259,7 +260,6 @@ class _EmailTextFieldsState extends State<_EmailTextFields> {
         errorMassage = null;
       }
     });
-
     super.initState();
   }
 
@@ -271,19 +271,22 @@ class _EmailTextFieldsState extends State<_EmailTextFields> {
         height: isThatMobile ? null : 37,
         width: double.infinity,
         child: BlocConsumer<FirebaseAuthCubit, FirebaseAuthCubitState>(
-          bloc: FirebaseAuthCubit.get(context)
-            ..isThisEmailToken(email: widget.controller.text),
+          bloc: FirebaseAuthCubit.get(context),
           listenWhen: (previous, current) =>
               previous != current && current is CubitEmailVerificationLoaded,
           listener: (context, state) {
             if (!widget.isThatLogin) {
               if (state is CubitEmailVerificationLoaded &&
                   state.isThisEmailToken) {
-                errorMassage = "This email already exists.";
-                widget.validate?.value = false;
+                setState(() {
+                  errorMassage = "This email already exists.";
+                  widget.validate?.value = false;
+                });
               } else {
-                errorMassage = null;
-                widget.validate?.value = true;
+                setState(() {
+                  errorMassage = null;
+                  widget.validate?.value = true;
+                });
               }
             }
           },
@@ -295,6 +298,18 @@ class _EmailTextFieldsState extends State<_EmailTextFields> {
               cursorColor: ColorManager.teal,
               style: getNormalStyle(
                   color: Theme.of(context).focusColor, fontSize: 15),
+              onChanged: (value) {
+                if (value.isNotEmpty && !widget.isThatLogin) {
+                  FirebaseAuthCubit.get(context)
+                      .isThisEmailToken(email: value);
+                }
+                if (value.isEmpty) {
+                  setState(() {
+                    errorMassage = null;
+                    widget.validate?.value = false;
+                  });
+                }
+              },
               decoration: InputDecoration(
                 hintText: widget.hint,
                 hintStyle: isThatMobile
