@@ -31,6 +31,11 @@ jobs:
       - name: Fix package name
         run: find lib -name "*.dart" -exec sed -i 's/package:instagram\//package:vibe\//g' {} +
 
+      - name: Remove page_transition
+        run: |
+          find lib -name "*.dart" -exec sed -i '/import.*page_transition/d' {} +
+          find lib -name "*.dart" -exec sed -i "s/PageTransition([ a-zA-Z0-9:_,'\".()*!?-]*)/MaterialPageRoute(builder: (_) => const SizedBox())/g" {} +
+
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
 
