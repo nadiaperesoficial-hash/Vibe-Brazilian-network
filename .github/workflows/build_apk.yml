@@ -25,11 +25,19 @@ jobs:
           flutter-version: '3.44.1'
           channel: 'stable'
 
+      - name: Fix pubspec page_transition
+        run: sed -i 's/page_transition: .*/page_transition: ^2.0.0/' pubspec.yaml
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Fix package name
         run: find lib -name "*.dart" -exec sed -i 's/package:instagram\//package:vibe\//g' {} +
+
+      - name: Fix uploadFile calls
+        run: |
+          find lib -name "*.dart" -exec sed -i 's/FirebaseStoragePost\.uploadFile(\(.*\))/FirebaseStoragePost.uploadFile(\1, "")/g' {} +
+          find lib -name "*.dart" -exec sed -i 's/FirebaseStoragePost\.uploadData(\(.*\))/FirebaseStoragePost.uploadData(\1, "")/g' {} +
 
       - name: Build APK
         run: flutter build apk --release --no-tree-shake-icons
