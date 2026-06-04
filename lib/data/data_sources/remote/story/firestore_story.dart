@@ -23,6 +23,8 @@ class FireStoreStory {
       List<UserPersonalInfo> usersInfo) async {
     List<Story> storiesInfo = [];
     List<String> storiesIds = [];
+    final now = DateTime.now();
+
     for (int i = 0; i < usersInfo.length; i++) {
       storiesInfo = [];
       List<dynamic> userStories = usersInfo[i].stories;
@@ -36,6 +38,14 @@ class FireStoreStory {
             await _fireStoreStoryCollection.doc(userStories[j]).get();
         if (snap.exists) {
           Story postReformat = Story.fromSnap(docSnap: snap);
+
+          // Deleta automaticamente stories expirados
+          if (postReformat.expiresAt != null &&
+              now.isAfter(postReformat.expiresAt!)) {
+            await deleteThisStory(storyId: postReformat.storyUid);
+            continue;
+          }
+
           if (postReformat.storyUrl.isNotEmpty) {
             postReformat.publisherInfo = usersInfo[i];
             if (!storiesIds.contains(postReformat.storyUid)) {
@@ -45,6 +55,13 @@ class FireStoreStory {
           }
         }
       }
+
+      if (storiesInfo.isEmpty) {
+        usersInfo.removeAt(i);
+        i--;
+        continue;
+      }
+
       usersInfo[i].storiesInfo = storiesInfo;
     }
     return usersInfo;
